@@ -86,6 +86,7 @@ class CARE(BaseModel):
             kern_size       = self.config.unet_kern_size,
             n_first         = self.config.unet_n_first,
             last_activation = self.config.unet_last_activation,
+            use_bias        = self.config.use_bias,
         )(self.config.unet_input_shape)
 
 

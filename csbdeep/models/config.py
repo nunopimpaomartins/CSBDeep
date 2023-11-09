@@ -170,6 +170,8 @@ class Config(BaseConfig):
         self.unet_kern_size        = 5 if self.n_dim==2 else 3
         self.unet_n_first          = 32
         self.unet_last_activation  = 'linear'
+        self.use_bias              = True,
+
         if backend_channels_last():
             self.unet_input_shape  = self.n_dim*(None,) + (self.n_channel_in,)
         else:
