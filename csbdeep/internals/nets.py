@@ -24,6 +24,7 @@ def custom_unet(input_shape,
                 n_channel_out=1,
                 residual=False,
                 prob_out=False,
+                use_bias=True,
                 eps_scale=1e-3):
     """ TODO """
 
@@ -39,10 +40,10 @@ def custom_unet(input_shape,
 
     input = Input(input_shape, name = "input")
     unet = unet_block(n_depth, n_filter_base, kernel_size,
-                      activation=activation, dropout=dropout, batch_norm=batch_norm,
+                      activation=activation, dropout=dropout, use_bias=use_bias, batch_norm=batch_norm,
                       n_conv_per_depth=n_conv_per_depth, pool=pool_size)(input)
 
-    final = conv(n_channel_out, (1,)*n_dim, activation='linear')(unet)
+    final = conv(n_channel_out, (1,)*n_dim, use_bias=use_bias, activation='linear')(unet)
     if residual:
         if not (n_channel_out == input_shape[-1] if backend_channels_last() else n_channel_out == input_shape[0]):
             raise ValueError("number of input and output channels must be the same for a residual net.")
@@ -58,7 +59,7 @@ def custom_unet(input_shape,
 
 
 
-def common_unet(n_dim=2, n_depth=1, kern_size=3, n_first=16, n_channel_out=1, residual=True, prob_out=False, last_activation='linear'):
+def common_unet(n_dim=2, n_depth=1, kern_size=3, n_first=16, n_channel_out=1, residual=True, prob_out=False, last_activation='linear', use_bias=True):
     """Construct a common CARE neural net based on U-Net [1]_ and residual learning [2]_ to be used for image restoration/enhancement.
 
     Parameters
@@ -97,7 +98,7 @@ def common_unet(n_dim=2, n_depth=1, kern_size=3, n_first=16, n_channel_out=1, re
     .. [2] Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun. *Deep Residual Learning for Image Recognition*, CVPR 2016
     """
     def _build_this(input_shape):
-        return custom_unet(input_shape, last_activation, n_depth, n_first, (kern_size,)*n_dim, pool_size=(2,)*n_dim, n_channel_out=n_channel_out, residual=residual, prob_out=prob_out)
+        return custom_unet(input_shape, last_activation, n_depth, n_first, (kern_size,)*n_dim, pool_size=(2,)*n_dim, n_channel_out=n_channel_out, residual=residual, prob_out=prob_out, use_bias=use_bias)
     return _build_this
 
 
